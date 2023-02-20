@@ -160,7 +160,7 @@ repos:
         entry: ./scripts/ci/pre_commit/pre_commit_update_common_sql_api_stubs.py
         language: python
         files: ^scripts/ci/pre_commit/pre_commit_update_common_sql_api\.py|^airflow/providers/common/sql/.*\.pyi?$
-        additional_dependencies: ['rich>=12.4.4', 'mypy==0.971', 'black==22.12.0', 'jinja2']
+        additional_dependencies: ['rich>=12.4.4', 'mypy==1.0.0', 'black==22.12.0', 'jinja2']
         pass_filenames: false
         require_serial: true
       - id: update-black-version
@@ -420,6 +420,13 @@ repos:
         pass_filenames: true
         files: \.py$
         exclude: ^airflow/_vendor/|^docs/|^tests/
+      - id: check-urlparse-usage-in-code
+        language: pygrep
+        name: Don't use urlparse in code
+        description: urlparse is not recommended, use urlsplit() in code instead
+        entry: "^\\s*from urllib\\.parse import ((\\|, )(urlparse\\|urlunparse))+$"
+        pass_filenames: true
+        files: \.py$
       - id: check-only-new-session-with-provide-session
         name: Check NEW_SESSION is only used with @provide_session
         language: python
@@ -711,6 +718,10 @@ repos:
         language: python
         pass_filenames: true
         files: ^scripts/ci/docker-compose/.+\.ya?ml$|docker-compose\.ya?ml$
+        exclude: >
+          (?x)
+          ^scripts/ci/docker-compose/grafana/.|
+          ^scripts/ci/docker-compose/.+-config\.ya?ml
         require_serial: true
         additional_dependencies: ['jsonschema>=3.2.0,<5.0', 'PyYAML==5.3.1', 'requests==2.25.0']
       - id: lint-json-schema
